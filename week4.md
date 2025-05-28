@@ -87,7 +87,7 @@ $2^{20}$ Bytes = 1MB
 bool test() {
   int a = 1;
   char *p_char_a = (char *)( &a );
-  return (*b_char_a) == 0;
+  return (*p_char_a) == 0;
 }
 ```
 
