@@ -152,11 +152,11 @@ interrupt.
 
 #### Question 34
 
-You've set up your thread's stack so that xPSR and PC contain the correct
-values, and the remaining registers contain the value 0xA. You run your code and
-your thread prints to UART a few times before you stop it and examine the
-registers using the debugger. You notice that almost all registers still hold
-the value 0xA, but R7 does not. What happened?
+You've set up the thread stack so that xPSR and PC contain the correct values,
+and the remaining registers contain the value `0xA`. You run your code and your
+thread prints to UART a few times before you stop it and examine the registers
+using the debugger. You notice that almost all registers still hold the value
+`0xA`, but `R7` does not. What happened?
 
 - A) R7 is a scratch register and is used by the compiler however it wishes. We
   cannot expect it to still have the original value after several function calls
@@ -177,19 +177,28 @@ Answer:
 The correct answer is A.
 
 In ARM architecture (e.g., ARM Cortex-M), registers are categorized into:
-- Caller-saved ("scratch") registers: R0–R3, R12, R7 (depending on ABI)
-- Callee-saved ("preserved") registers: R4–R11 (must be preserved across
+- Caller-saved ("scratch") registers: R0–R3, R12
+- Callee-saved ("variable") registers: R4–R11 (must be preserved across
   function calls)
+
+Note that here caller is the function that calls another function, and callee is
+the function that is called by another function.
 
 R7 is often used by compilers as:
 - A frame pointer (especially in debugging builds).
 - A general-purpose scratch register (if frame pointers are omitted or optimized
   out).
 
+This means compilers (especially when debug info is enabled) will insert
+assembly instructions before your code runs, setting up R7. They will typically
+restore R7 before the function returns. However, if you inspect R7 in the middle
+of function execution, you'll see it has been overwritten.
+
 Therefore, its value is not guaranteed to persist across function calls like
-printf(). The fact that other registers still contain 0xA supports the idea that
-the stack was correctly initialized and no corruption occurred. Only R7 changed
-is exactly what you'd expect if it were used by the compiler during execution.
+`printf()`. The fact that other registers still contain 0xA supports the idea
+that the stack was correctly initialized and no corruption occurred. Only R7
+changed is exactly what you'd expect if it were used by the compiler during
+execution.
 
 ---
 
